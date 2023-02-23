@@ -1,0 +1,55 @@
+name: "Deployment Artifact ID"
+author: "Pete McWilliams"
+description: >-
+  Create an artifact ID file in JSON format used for documenting the GitHub Action run data for each deployment cycle.
+
+branding:
+  icon: "file-plus"
+  color: "orange"
+
+inputs:
+  filename:
+    description: >-
+      The name of the artifact ID file, not including a file extension.
+    required: false
+    default: "VERSION"
+  git-sha:
+    description: >-
+      The commit SHA that triggered the workflow.
+    required: false
+    default: "${{ github.sha }}"
+  run-id:
+    description: >-
+      A unique number for each workflow run within a repository.
+    required: false
+    default: "${{ github.run_id }}"
+  run-number:
+    description: >-
+      A unique number for each run of a particular workflow in a repository.
+    required: false
+    default: "${{ github.run_number }}"
+  run-attempt:
+    description: >-
+      A unique number for each attempt of a particular workflow run in a repository.
+    required: false
+    default: "${{ github.run_attempt }}"
+  working-directory:
+    description: >-
+      The directory where the artifact file will be located, if it is not in the repository root.
+    default: "${{ github.workspace }}"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Create artifact ID file with workflow run data"
+      id: "create-artifact-id"
+      shell: "bash"
+      run: |
+        ${GITHUB_ACTION_PATH}/bin/write_file.sh \
+          "${{ inputs.working-directory }}" \
+          "${{ inputs.filename }}" \
+          "${{ inputs.git-sha }}" \
+          "${{ inputs.run-id }}" \
+          "${{ inputs.run-number }}" \
+          "${{ inputs.run-attempt }}"
